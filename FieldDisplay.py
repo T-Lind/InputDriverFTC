@@ -1,5 +1,5 @@
 import time
-
+from FieldDisplayRobot import Robot, GraphicalRobot, in_to_pixels, pixels_to_in
 import pygame
 
 
@@ -21,6 +21,8 @@ class FieldDisplay:
                  ROBOT_INIT_X=0,
                  ROBOT_INIT_Y=0,
                  ROBOT_INIT_HEADING=0,
+                 MAX_VEL=60,
+                 MAX_ACC=25
                  ):
 
         self.WINDOW_HEIGHT = WINDOW_HEIGHT
@@ -33,42 +35,28 @@ class FieldDisplay:
 
         self.image = pygame.image.load(r'rover-ruckus-field.png')
 
-        self.ROBOT_SIZE = ROBOT_SIZE / 0.222
-        self.robot_image = pygame.image.load('robot_image.png')
-        self.robot_image = pygame.transform.scale(self.robot_image, (self.ROBOT_SIZE, self.ROBOT_SIZE))
-        self.robot_pivot = (self.robot_image.get_width() / 2, self.robot_image.get_height() / 2)
-
-        self.robot = pygame.Surface([self.ROBOT_SIZE, self.ROBOT_SIZE])
-        self.robot.set_colorkey((0, 0, 0))
-        self.robot.fill((255, 255, 0))
+        self.robot_kinematics = Robot(x=ROBOT_INIT_X, y=ROBOT_INIT_Y, heading=ROBOT_INIT_HEADING, size=ROBOT_SIZE,
+                                      max_v=MAX_VEL, max_a=MAX_ACC)
+        self.graphical_robot = GraphicalRobot(ROBOT_SIZE, WINDOW_WIDTH)
 
         self.running = True
-
-        # Kinematic data
-
-        self.robot_x = ROBOT_INIT_X
-        self.robot_y = ROBOT_INIT_Y
-        self.robot_heading = ROBOT_INIT_HEADING
-
-        self.robot_vel_x = 1
-        self.robot_vel_y = 0
-
-        self.robot_acc_x = 0
-        self.robot_acc_y = 0
 
         self.last_time = time.time()
         self.current_time = time.time()
 
     def __call__(self):
         self.current_time = time.time()
-        time_step = self.current_time-self.last_time
+        time_step = self.current_time - self.last_time
 
-        self.robot_x += self.robot_vel_x*time_step
-        self.robot_y += self.robot_vel_y*time_step
+        self.robot_kinematics.motion_check()
 
-        self.robot_vel_x += self.robot_acc_x*time_step
-        self.robot_vel_y += self.robot_acc_y*time_step
+        self.robot_kinematics.x += self.robot_kinematics.vel_x * time_step
+        self.robot_kinematics.y += self.robot_kinematics.vel_y * time_step
 
+        self.robot_kinematics.vel_x += self.robot_kinematics.acc_x * time_step
+        self.robot_kinematics.vel_y += self.robot_kinematics.acc_y * time_step
+
+        # Draw the background
         self.win.blit(self.image, (0, 0))
 
         # Event activator
@@ -76,8 +64,9 @@ class FieldDisplay:
             if event.type == pygame.QUIT:
                 self.running = False
 
-        pos = (self.robot_x, self.robot_y)
-        blitRotate(self.win, self.robot_image, pos, self.robot_pivot, self.robot_heading)
+        pos = (in_to_pixels(self.robot_kinematics.x, self.WINDOW_WIDTH), in_to_pixels(self.robot_kinematics.y, self.WINDOW_WIDTH))
+        blitRotate(self.win, self.graphical_robot.robot_image, pos, self.graphical_robot.robot_image_pivot,
+                   self.robot_kinematics.heading)
 
         pygame.draw.line(self.win, (0, 255, 0), (pos[0] - 10, pos[1]), (pos[0] + 10, pos[1]), 2)
         pygame.draw.line(self.win, (0, 255, 0), (pos[0], pos[1] - 10), (pos[0], pos[1] + 10), 2)
@@ -88,44 +77,41 @@ class FieldDisplay:
 
         self.last_time = self.current_time
 
-    def in_to_pixels(self, val):
-        return val*(self.WINDOW_WIDTH/141)
-
     def set_motion(self, vel_x=None, vel_y=None, acc_x=None, acc_y=None, heading=None):
         if vel_x is not None:
-            self.robot_vel_x = self.in_to_pixels(vel_x)
+            self.robot_kinematics.vel_x = vel_x
 
         if vel_y is not None:
-            self.robot_vel_y = self.in_to_pixels(vel_y)
+            self.robot_kinematics.vel_y = vel_y
 
         if acc_x is not None:
-            self.robot_acc_x = self.in_to_pixels(acc_x)
+            self.robot_kinematics.acc_x = acc_x
 
         if acc_y is not None:
-            self.robot_acc_x = self.in_to_pixels(acc_y)
+            self.robot_kinematics.acc_y = acc_y
 
         if heading is not None:
-            self.robot_heading = heading
+            self.robot_kinematics.heading = heading
 
         # Check if it has collided
 
-        if self.robot_x+self.ROBOT_SIZE/2 >= self.WINDOW_WIDTH:
-            self.robot_vel_x = 0
-            self.robot_acc_x = 0
+        robot_buffer_size = self.robot_kinematics.size / 2
+
+        if in_to_pixels(self.robot_kinematics.x + robot_buffer_size, self.WINDOW_WIDTH) >= self.WINDOW_WIDTH:
+            self.robot_kinematics.x = pixels_to_in(self.WINDOW_WIDTH, self.WINDOW_WIDTH) - robot_buffer_size
             print("Collision!")
 
-        if self.robot_y+self.ROBOT_SIZE/2 >= self.WINDOW_HEIGHT:
-            self.robot_vel_y = 0
-            self.robot_acc_y = 0
+        if in_to_pixels(self.robot_kinematics.y + robot_buffer_size, self.WINDOW_WIDTH) >= self.WINDOW_HEIGHT:
+            self.robot_kinematics.y = pixels_to_in(self.WINDOW_HEIGHT, self.WINDOW_WIDTH) - robot_buffer_size
             print("Collision!")
 
-        if self.robot_x < self.ROBOT_SIZE/2:
-            self.robot_vel_x = 0
-            self.robot_acc_x = 0
+        if self.robot_kinematics.x < robot_buffer_size:
+            self.robot_kinematics.x = robot_buffer_size
             print("Collision!")
 
-        if self.robot_y < self.ROBOT_SIZE/2:
-            self.robot_vel_y = 0
-            self.robot_acc_y = 0
+        if self.robot_kinematics.y < robot_buffer_size:
+            self.robot_kinematics.y = robot_buffer_size
             print("Collision!")
+
+    # def set_objective(self, name="Objective", objective_type="deposit", x=100, y=100):
 
