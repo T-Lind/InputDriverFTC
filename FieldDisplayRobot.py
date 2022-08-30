@@ -35,19 +35,19 @@ class Robot:
     def motion_check(self):
         if self.vel_x > self.max_v:
             self.vel_x = self.max_v
-            print("Reached max x vel")
+            # print("Reached max x vel")
 
         if self.vel_y > self.max_v:
             self.vel_y = self.max_v
-            print("Reached max y vel")
+            # print("Reached max y vel")
 
         if self.acc_x > self.max_a:
             self.acc_x = self.max_a
-            print("Reached max x acc")
+            # print("Reached max x acc")
 
         if self.acc_y > self.max_a:
             self.acc_y = self.max_a
-            print("Reached max y acc")
+            # print("Reached max y acc")
 
 
 class GraphicalRobot:
