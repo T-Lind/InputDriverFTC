@@ -22,6 +22,9 @@ class Robot:
         self.acc_y = acc_y
 
         self.heading = heading
+        self.heading_v = 0
+        self.heading_acc = 0
+
         self.size = size
 
         self.max_v = max_v
@@ -49,6 +52,8 @@ class Robot:
             self.acc_y = self.max_a
             # print("Reached max y acc")
 
+    def get_robot_state(self):
+        return [self.x, self.y, self.heading]
 
 class GraphicalRobot:
     def __init__(self, ROBOT_SIZE, WINDOW_WIDTH):

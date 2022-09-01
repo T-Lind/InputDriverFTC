@@ -15,6 +15,8 @@ def blitRotate(surf, image, pos, originPos, angle):
 
 
 class FieldDisplay:
+    N_INPUTS = 6
+
     def __init__(self,
                  WINDOW_WIDTH=632,
                  WINDOW_HEIGHT=632,
@@ -69,6 +71,7 @@ class FieldDisplay:
         self.last_time = time.time()
         self.current_time = time.time()
         self.run_time = time.time()
+        self.elapsed_time = 0
 
         self.last_time_printed = -1
 
@@ -87,7 +90,11 @@ class FieldDisplay:
         self.robot_kinematics.vel_x += self.robot_kinematics.acc_x * time_step
         self.robot_kinematics.vel_y += self.robot_kinematics.acc_y * time_step
 
+        self.robot_kinematics.heading += self.robot_kinematics.heading_v * time_step
+        self.robot_kinematics.heading_v += self.robot_kinematics.heading_acc * time_step
+
         time_elapsed = int((time.time()-self.run_time))
+        self.elapsed_time = time_elapsed
         if self.telemetry and time_elapsed % 3 == 0 and time_elapsed != self.last_time_printed:
             self.last_time_printed = time_elapsed
             print(f'''\
@@ -163,6 +170,24 @@ class FieldDisplay:
 
         if self.robot_kinematics.y < robot_buffer_size:
             self.robot_kinematics.y = robot_buffer_size
+
+
+    def take_action(self, num):
+        if num == 0:
+            self.robot_kinematics.acc_x += 0.01
+        elif num == 1:
+            self.robot_kinematics.acc_x -= 0.01
+        elif num == 2:
+            self.robot_kinematics.acc_y += 0.01
+        elif num == 3:
+            self.robot_kinematics.acc_y -= 0.01
+        elif num == 4:
+            self.robot_kinematics.heading_acc += 0.01
+        elif num == 5:
+            self.robot_kinematics.heading_acc -= 0.01
+
+        objective = self.objectives[-1]
+        return 1/math.hypot(objective.x-self.robot_kinematics.x, objective.y-self.robot_kinematics.y)
 
     def set_objective(self, name="Objective", objective_type="deposit", x=100, y=100):
         self.objectives.append(Objective(name, objective_type, x, y))
