@@ -75,9 +75,12 @@ class FieldDisplay:
 
         self.last_time_printed = -1
 
-    def __call__(self):
+        self.finished = False
+
+    def __call__(self, finished=False):
         """
         Method to run the field display. Takes no arguments and updates the robot position and graphics
+        :param finished set the field to finish
         """
         self.current_time = time.time()
         time_step = self.current_time - self.last_time

@@ -11,7 +11,7 @@ def pixels_to_in(WINDOW_WIDTH, val):
 
 class Robot:
     def __init__(self, x=0, y=0, vel_x=0, vel_y=0, acc_x=0, acc_y=0, heading=0, size=18, max_v=60, max_a=30,
-                 loaded=False):
+                 loaded=False, left_side_inverted=True, right_side_inverted=False):
         self.x = x
         self.y = y
 
@@ -35,6 +35,9 @@ class Robot:
         # Keep track of points scored
         self.score = 0
 
+        self.left_side_inverted = left_side_inverted
+        self.right_side_inverted = right_side_inverted
+
     def motion_check(self):
         if self.vel_x > self.max_v:
             self.vel_x = self.max_v
@@ -54,6 +57,7 @@ class Robot:
 
     def get_robot_state(self):
         return [self.x, self.y, self.heading]
+
 
 class GraphicalRobot:
     def __init__(self, ROBOT_SIZE, WINDOW_WIDTH):
