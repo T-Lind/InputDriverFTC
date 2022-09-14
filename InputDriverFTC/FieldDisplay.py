@@ -15,8 +15,6 @@ def blitRotate(surf, image, pos, originPos, angle):
 
 
 class FieldDisplay:
-    N_INPUTS = 6
-
     def __init__(self,
                  WINDOW_WIDTH=632,
                  WINDOW_HEIGHT=632,
@@ -48,7 +46,7 @@ class FieldDisplay:
         self.telemetry = TELEMETRY
 
         # Create the robot which controls all the kinematics
-        self.robot_kinematics = Robot(x=ROBOT_INIT_X, y=ROBOT_INIT_Y, heading=ROBOT_INIT_HEADING, size=ROBOT_SIZE,
+        self.robot_kinematics = Robot(x=ROBOT_INIT_X*39.37, y=ROBOT_INIT_Y*39.37, heading=ROBOT_INIT_HEADING, size=ROBOT_SIZE,
                                       max_v=MAX_VEL, max_a=MAX_ACC)
 
         if self.GUI:
@@ -56,7 +54,7 @@ class FieldDisplay:
             pygame.display.set_caption("Robot Input Driver for FTC")
 
             self.win = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
-            self.image = pygame.image.load(r'rover-ruckus-field.png')
+            self.image = pygame.image.load(r'power-play-field.png')
 
             # Create the graphics for the robot
             self.graphical_robot = GraphicalRobot(ROBOT_SIZE, WINDOW_WIDTH)
@@ -71,16 +69,12 @@ class FieldDisplay:
         self.last_time = time.time()
         self.current_time = time.time()
         self.run_time = time.time()
-        self.elapsed_time = 0
 
-        self.last_time_printed = -1
+        self.last_time_printed = 0
 
-        self.finished = False
-
-    def __call__(self, finished=False):
+    def __call__(self):
         """
         Method to run the field display. Takes no arguments and updates the robot position and graphics
-        :param finished set the field to finish
         """
         self.current_time = time.time()
         time_step = self.current_time - self.last_time
@@ -93,20 +87,9 @@ class FieldDisplay:
         self.robot_kinematics.vel_x += self.robot_kinematics.acc_x * time_step
         self.robot_kinematics.vel_y += self.robot_kinematics.acc_y * time_step
 
-        self.robot_kinematics.heading += self.robot_kinematics.heading_v * time_step
-        self.robot_kinematics.heading_v += self.robot_kinematics.heading_acc * time_step
-
         time_elapsed = int((time.time()-self.run_time))
-        self.elapsed_time = time_elapsed
         if self.telemetry and time_elapsed % 3 == 0 and time_elapsed != self.last_time_printed:
             self.last_time_printed = time_elapsed
-            print(f'''\
-                =================
-                Telemetry Output:
-                X: {self.robot_kinematics.x}, Y: {self.robot_kinematics.y}
-                X velocity: {self.robot_kinematics.vel_x}, Y velocity: {self.robot_kinematics.vel_y}
-                X acceleration: {self.robot_kinematics.acc_x}, Y acceleration: {self.robot_kinematics.acc_y}
-            ''')
 
         if self.GUI:
             # Event activator
@@ -133,27 +116,33 @@ class FieldDisplay:
 
         self.last_time = self.current_time
 
-    def set_motion(self, vel_x=None, vel_y=None, acc_x=None, acc_y=None, heading=None):
+    def set_motion(self, x=None, y=None, vel_x=None, vel_y=None, acc_x=None, acc_y=None, heading=None):
         """
         Set motion data to the robot object
+        :param x: the x pos to set
+        :param y: the y pos to set
         :param vel_x: The velocity for the robot to go at in the x direction (in/s)
         :param vel_y: The velocity for the robot to go at in the y direction (in/s)
         :param acc_x: The velocity for the robot to go at in the x direction (in/s^2)
         :param acc_y: The velocity for the robot to go at in the y direction (in/s^2)
         :param heading: The heading for the robot to be at
-        :return:
         """
+        if x is not None:
+            self.robot_kinematics.x = 39.37*x
+        if y is not None:
+            self.robot_kinematics.y = 39.37*y
+
         if vel_x is not None:
-            self.robot_kinematics.vel_x = vel_x
+            self.robot_kinematics.vel_x = 39.37*vel_x
 
         if vel_y is not None:
-            self.robot_kinematics.vel_y = vel_y
+            self.robot_kinematics.vel_y = 39.37*vel_y
 
         if acc_x is not None:
-            self.robot_kinematics.acc_x = acc_x
+            self.robot_kinematics.acc_x = 39.37*acc_x
 
         if acc_y is not None:
-            self.robot_kinematics.acc_y = acc_y
+            self.robot_kinematics.acc_y = 39.37*acc_y
 
         if heading is not None:
             self.robot_kinematics.heading = heading
@@ -173,24 +162,6 @@ class FieldDisplay:
 
         if self.robot_kinematics.y < robot_buffer_size:
             self.robot_kinematics.y = robot_buffer_size
-
-
-    def take_action(self, num):
-        if num == 0:
-            self.robot_kinematics.acc_x += 0.01
-        elif num == 1:
-            self.robot_kinematics.acc_x -= 0.01
-        elif num == 2:
-            self.robot_kinematics.acc_y += 0.01
-        elif num == 3:
-            self.robot_kinematics.acc_y -= 0.01
-        elif num == 4:
-            self.robot_kinematics.heading_acc += 0.01
-        elif num == 5:
-            self.robot_kinematics.heading_acc -= 0.01
-
-        objective = self.objectives[-1]
-        return 1/math.hypot(objective.x-self.robot_kinematics.x, objective.y-self.robot_kinematics.y)
 
     def set_objective(self, name="Objective", objective_type="deposit", x=100, y=100):
         self.objectives.append(Objective(name, objective_type, x, y))
