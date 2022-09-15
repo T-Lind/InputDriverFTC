@@ -1,5 +1,3 @@
-import math
-import time
 from FieldDisplayRobot import Robot, GraphicalRobot, m_to_pixels, pixels_to_m
 import pygame
 

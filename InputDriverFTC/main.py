@@ -2,7 +2,7 @@ import math
 import sys
 import time
 
-from FieldDisplay import FieldDisplay
+from InputDriverFTC.FieldDisplay import FieldDisplay
 
 # Size of robot is in inches, the rest is in meters
 robot = FieldDisplay(ROBOT_INIT_X=3.35, ROBOT_INIT_Y=0.88, ROBOT_INIT_HEADING=180, ROBOT_SIZE=0.406)

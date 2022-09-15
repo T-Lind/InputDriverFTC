@@ -7,7 +7,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     long_description = "\n" + fh.read()
 
-VERSION = '0.2'
+VERSION = '0.3'
 DESCRIPTION = 'Pathing library for FTC robotics.'
 LONG_DESCRIPTION = 'A package that allows for the control of a robot on a FTC field, specifically meant to work with two wheel differential swerve.'
 
@@ -24,7 +24,6 @@ setup(
     install_requires=['pygame'],
     keywords=['python', 'FTC', 'autonomous', 'robotics'],
     classifiers=[
-        "Development Status :: 2 - Release",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
         "Operating System :: Unix",
