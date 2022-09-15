@@ -1,7 +1,6 @@
 import math
 import time
 from FieldDisplayRobot import Robot, GraphicalRobot, m_to_pixels, pixels_to_m
-from Objective import Objective
 import pygame
 
 def blitRotate(surf, image, pos, originPos, angle):
