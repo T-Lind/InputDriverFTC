@@ -58,7 +58,7 @@ class FieldDisplay:
         pos = (m_to_pixels(self.WINDOW_WIDTH, self.robot_init_x)+m_to_pixels(self.WINDOW_WIDTH, self.robot_kinematics.x),
                m_to_pixels(self.WINDOW_HEIGHT, self.robot_init_y)+m_to_pixels(self.WINDOW_HEIGHT, self.robot_kinematics.y))
         blitRotate(self.win, self.graphical_robot.robot_image, pos, self.graphical_robot.robot_image_pivot,
-                   self.robot_kinematics.heading)
+                   self.robot_kinematics.heading+self.robot_init_heading)
 
         pygame.draw.line(self.win, (0, 255, 0), (pos[0] - 10, pos[1]), (pos[0] + 10, pos[1]), 2)
         pygame.draw.line(self.win, (0, 255, 0), (pos[0], pos[1] - 10), (pos[0], pos[1] + 10), 2)

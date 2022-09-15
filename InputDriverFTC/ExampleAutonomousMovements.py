@@ -10,24 +10,17 @@ robot = FieldDisplay(ROBOT_INIT_X=3.35, ROBOT_INIT_Y=0.88, ROBOT_INIT_HEADING=18
 
 def get_x(t):
     if t < 2:
-        return 0.64 * math.cos(math.pi / 2 * t) - 0.64
-    return -0.64 * 2
-
-
+        return 0.64*math.cos(math.pi/2*t)-0.64
+    return -0.64*2
 def get_y(t):
     if t < 1.6:
         return 0
     if t < 3.4:
-        return -0.21 * math.sin(0.7 * math.pi * t - 0.9) + 0.105
+        return -0.21*math.sin(0.7*math.pi*t-0.9)+0.105
     return 0.044
 
-
 def get_heading(t):
-    if t < 3.4:
-        return 0
-    elif t < 4.4:
-        return -45 * math.cos(0.75 * t * math.pi - 1.7) + 45
-    return 90
+    return 0
 
 
 if __name__ == "__main__":
