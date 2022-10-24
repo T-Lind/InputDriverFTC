@@ -30,8 +30,10 @@ def get_y(t):
     if t < 25.25:
         return 0.044
     if t < 26.25:
-        return 0.044 - 0.3 - 0.3 * math.cos(math.pi * t - 0.79)
+        return 0.044-0.3-0.3*math.cos(math.pi*t-0.79)
     return -0.556
+
+
 
 
 def get_heading(t):
